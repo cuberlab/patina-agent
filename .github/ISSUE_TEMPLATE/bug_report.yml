@@ -1,5 +1,5 @@
 name: Bug 回報
-description: Patina app 或 patina CLI 的錯誤
+description: Patina app 的錯誤，或照 README 改圖庫時遇到的問題
 labels: ["bug"]
 body:
   - type: markdown
@@ -27,12 +27,6 @@ body:
     validations:
       required: true
   - type: input
-    id: cli-version
-    attributes:
-      label: CLI 版本
-      description: "`patina --version` 的輸出；這次沒用到 CLI 就寫「沒用」"
-      placeholder: patina 0.2.1
-  - type: input
     id: macos-version
     attributes:
       label: macOS 版本
@@ -44,7 +38,7 @@ body:
     id: action
     attributes:
       label: 做了什麼
-      description: 在 app 裡按了什麼，或跑了哪個指令（完整指令）
+      description: 在 app 裡按了什麼，或改了哪些側檔、跑了哪段程式（完整內容）
     validations:
       required: true
   - type: textarea
@@ -63,7 +57,7 @@ body:
     id: error-message
     attributes:
       label: 錯誤訊息原文
-      description: app 跳出的訊息或 CLI 印出的錯誤，照原文貼，不要改寫
+      description: app 跳出的訊息，或程式印出的錯誤，照原文貼，不要改寫
       render: text
   - type: textarea
     id: logs

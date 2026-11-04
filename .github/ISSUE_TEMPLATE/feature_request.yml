@@ -1,5 +1,5 @@
 name: 功能建議
-description: Patina app 或 patina CLI 想要的新功能
+description: Patina app 或這份 agent 說明想要的新功能
 labels: ["enhancement"]
 body:
   - type: markdown
