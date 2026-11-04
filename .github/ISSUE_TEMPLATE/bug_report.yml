@@ -1,0 +1,85 @@
+name: Bug 回報
+description: Patina app 或 patina CLI 的錯誤
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **這個 repo 是公開的，issue 誰都看得到。**
+
+        - 不要貼私人照片，也不要貼截圖裡的私人內容。
+        - 不要貼描述內容。
+        - 家目錄路徑改成 `~`（寫 `~/Patina`，不要寫出帳號名稱）。
+        - 檔名是私人的就改成代稱（例如 `照片A.jpg`）。
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: 隱私確認
+      options:
+        - label: 已拿掉私人照片、截圖裡的私人內容與描述內容；家目錄路徑寫成 `~`；私人檔名改成代稱
+          required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: Patina app 版本
+      description: app 側欄左下角顯示的版本
+      placeholder: Patina 0.2.1 (20261104083511)
+    validations:
+      required: true
+  - type: input
+    id: cli-version
+    attributes:
+      label: CLI 版本
+      description: "`patina --version` 的輸出；這次沒用到 CLI 就寫「沒用」"
+      placeholder: patina 0.2.1
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS 版本
+      description: "`sw_vers -productVersion` 的輸出"
+      placeholder: "15.5"
+    validations:
+      required: true
+  - type: textarea
+    id: action
+    attributes:
+      label: 做了什麼
+      description: 在 app 裡按了什麼，或跑了哪個指令（完整指令）
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 預期結果
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 實際結果
+    validations:
+      required: true
+  - type: textarea
+    id: error-message
+    attributes:
+      label: 錯誤訊息原文
+      description: app 跳出的訊息或 CLI 印出的錯誤，照原文貼，不要改寫
+      render: text
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相關紀錄
+      description: |
+        `.patina/log/errors-<主機>.jsonl` 裡和這次有關的幾行，或 `.patina/log/eagle-import-*.jsonl` 裡 `"status":"error"` 的那幾行。
+        `path`、`src`、`dest` 裡的家目錄路徑改成 `~`，私人檔名改成代稱。
+      render: text
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重現步驟
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true

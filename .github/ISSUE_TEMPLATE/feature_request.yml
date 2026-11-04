@@ -1,0 +1,22 @@
+name: 功能建議
+description: Patina app 或 patina CLI 想要的新功能
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **這個 repo 是公開的，issue 誰都看得到。** 不要貼私人照片、截圖裡的私人內容或描述內容；家目錄路徑改成 `~`，私人檔名改成代稱。
+  - type: textarea
+    id: goal
+    attributes:
+      label: 想做什麼
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: 現在怎麼做、卡在哪
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建議的做法
