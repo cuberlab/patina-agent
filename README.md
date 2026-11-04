@@ -27,7 +27,7 @@ Patina 是一個 Mac 圖庫 app，照片、影片和字體可以放在一起整�
 6. **不動 `.patina/vault.json` 與 `.patina/removed/`**：`vault.json` 的 id 是圖庫身分；`removed/` 是丟進垃圾桶的檔案的側檔，檔案放回來時靠它接回。
 7. **刪檔案或資料夾請使用者在 Patina app 裡做**：會進 macOS 垃圾桶，可以復原，側檔移到 `.patina/removed/`。
 8. **色票、尺寸、片長這類從檔案算得出來的資料不寫進側檔**，app 自己算。
-9. **看到衝突副本（名稱含 `.sync-conflict-`）就告訴使用者**，不要自己挑一份刪掉。
+9. **不要自己處理衝突副本（名稱含 `.sync-conflict-`）**：側檔的副本 Patina 0.2.4 起會自動合併；照片、影片本身的副本告訴使用者，不要自己挑一份刪掉。
 10. **Syncthing 不能忽略 `.patina/`**：設定或建議忽略規則時照「Syncthing 設定」那段，不要加 `.*`、`.patina` 這類規則。
 11. **改完跑 `check()`**，印「沒有問題」才算完成。
 
@@ -405,7 +405,10 @@ Syncthing 這個資料夾的「忽略模式」（資料夾根目錄的 `.stignor
 
 ## 同步衝突
 
-圖庫用 Syncthing 在多台電腦同步時，兩邊同時改同一份檔案，會多一份名稱含 `.sync-conflict-` 的副本（例如 `IMG_0001.jpg.sync-conflict-20261104-083000-ABCDEFG.json`）。Patina 和 `check()` 都不讀它，`check()` 會列出來。看到就告訴使用者是哪幾份，不要自己挑一份刪掉或合併。
+圖庫用 Syncthing 在多台電腦同步時，兩邊離線時改了同一份檔案，會多一份名稱含 `.sync-conflict-` 的副本（例如 `.patina/meta/2025/IMG_0001.jpg.sync-conflict-20261104-083000-ABCDEFG.json`）。
+
+- **側檔的副本**（`.patina/meta/`、`.patina/removed/` 底下）：Patina 0.2.4 起打開圖庫、偵測到變動時會自動合併：標籤取聯集，描述、網址、評分取 `updated_at` 比較新的那份（沒有 `updated_at` 就看側檔的修改時間），被蓋掉的值寫進 `.patina/log/`。agent 不要自己合併或刪掉。`check()` 列出來時，請使用者打開 Patina（0.2.4 以上）讓它合併，再跑一次 `check()`；還在就告訴使用者是哪幾份。
+- **照片、影片本身的副本**：Patina 不會自動處理（不知道哪個才對）。告訴使用者是哪幾份，讓使用者決定留哪個。
 
 ## 從 Eagle 匯入
 

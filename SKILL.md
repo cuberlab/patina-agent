@@ -14,7 +14,7 @@ description: >
 
 1. 確認圖庫根目錄有 `.patina/vault.json`。
 2. 把 README「側檔工具」那段 Python 存成圖庫外面的 `patina_meta.py`，改 `VAULT`、`AGENT`。
-3. 跑 `check()`：列出衝突副本（`.sync-conflict-`）或格式不對的側檔，就停下來告訴使用者。
+3. 跑 `check()`：列出格式不對的側檔就停下來告訴使用者。列出衝突副本（`.sync-conflict-`）時：側檔的請使用者打開 Patina 0.2.4 以上讓它自動合併，照片、影片的告訴使用者。
 
 ## 做事
 
@@ -30,7 +30,7 @@ description: >
 
 - 照片、影片、字體檔本身：不寫 EXIF／IPTC、不重新存檔、不轉檔。
 - `.patina/vault.json`、`.patina/removed/`、`.patina/log/`（只讀）。
-- 衝突副本：告訴使用者，不要自己刪或合併。
+- 衝突副本：不要自己刪或合併（側檔的 Patina 會合併，照片、影片的讓使用者決定）。
 - Syncthing 忽略規則：不能擋到 `.patina/`（不要加 `.*`、`.patina`）；要建議規則時照 README「Syncthing 設定」。
 
 ## 收尾
