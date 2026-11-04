@@ -68,6 +68,17 @@ body:
         `path`、`src`、`dest` 裡的家目錄路徑改成 `~`，私人檔名改成代稱。
       render: text
   - type: textarea
+    id: library-size
+    attributes:
+      label: 圖庫規模（很慢、卡住時填）
+      description: 檔案數、影片數、總大小；當時 Syncthing 有沒有在同步、加了多少檔案、卡了多久。指令見 README「很慢、卡住」。
+  - type: textarea
+    id: sample
+    attributes:
+      label: 卡住時的 sample（很慢、卡住時填）
+      description: README「很慢、卡住」那兩段指令的輸出，照原文貼。不要貼整份 /tmp/patina-sample.txt（含帳號名稱和路徑）。
+      render: text
+  - type: textarea
     id: steps
     attributes:
       label: 重現步驟

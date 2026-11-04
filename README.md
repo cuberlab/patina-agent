@@ -28,7 +28,8 @@ Patina 是一個 Mac 圖庫 app，照片、影片和字體可以放在一起整�
 7. **刪檔案或資料夾請使用者在 Patina app 裡做**：會進 macOS 垃圾桶，可以復原，側檔移到 `.patina/removed/`。
 8. **色票、尺寸、片長這類從檔案算得出來的資料不寫進側檔**，app 自己算。
 9. **看到衝突副本（名稱含 `.sync-conflict-`）就告訴使用者**，不要自己挑一份刪掉。
-10. **改完跑 `check()`**，印「沒有問題」才算完成。
+10. **Syncthing 不能忽略 `.patina/`**：設定或建議忽略規則時照「Syncthing 設定」那段，不要加 `.*`、`.patina` 這類規則。
+11. **改完跑 `check()`**，印「沒有問題」才算完成。
 
 ## 側檔在哪
 
@@ -379,6 +380,29 @@ EOF
 2. Patina 開著的話，畫面會自己更新：app 會監看整個圖庫資料夾，有變動就重讀。
 3. Patina 讀不了的側檔不會跳錯誤，也不會寫進 `.patina/log/`，只會當成沒有整理資料，所以一定要跑 `check()`。
 
+## Syncthing 設定
+
+圖庫用 Syncthing 同步時，整個資料夾都要同步，包括 `.patina/`：標籤、描述、評分、資料夾整理都在裡面，擋掉的話每台電腦會各改各的。Syncthing 自己的 `.stfolder`、`.stversions` 和下載中的 `.syncthing.*.tmp` 它本來就不會同步，不用寫。
+
+Syncthing 這個資料夾的「忽略模式」（資料夾根目錄的 `.stignore`）只放系統產生的檔案：
+
+```
+// Patina 圖庫：.patina 不能忽略
+(?d).DS_Store
+(?d)._*
+(?d).Spotlight-V100
+(?d).Trashes
+(?d).fseventsd
+(?d).TemporaryItems
+(?d)Thumbs.db
+(?d)desktop.ini
+```
+
+- `(?d)` 讓 Syncthing 刪資料夾時可以順便刪掉這些檔，不會卡住。
+- 不要寫 `.*`、`*`、`.patina`、`/.patina` 這類會擋到 `.patina/` 的規則。圖庫放在更大的 Syncthing 資料夾裡也一樣（例如同步整個 `~/Sync`，圖庫是裡面的 `Patina`）。
+- `.stignore` 不會在裝置之間同步，每台都要設。
+- Patina 0.2.4 起打開圖庫時會檢查；擋到 `.patina/` 會跳錯誤提示，並寫進 `.patina/log/errors-<主機>.jsonl`。
+
 ## 同步衝突
 
 圖庫用 Syncthing 在多台電腦同步時，兩邊同時改同一份檔案，會多一份名稱含 `.sync-conflict-` 的副本（例如 `IMG_0001.jpg.sync-conflict-20261104-083000-ABCDEFG.json`）。Patina 和 `check()` 都不讀它，`check()` 會列出來。看到就告訴使用者是哪幾份，不要自己挑一份刪掉或合併。
@@ -412,5 +436,27 @@ grep -h '"status":"error"' ~/Patina/.patina/log/eagle-import-*.jsonl  # app「�
 ```
 
 沒有這個檔（zsh 印 `no matches found`）就是沒有這類紀錄。紀錄裡的 `path`、`src`、`dest` 含檔名與家目錄路徑，貼上前照上面的規則改。
+
+### 很慢、卡住
+
+另外附：
+
+- **圖庫規模**：檔案數、影片數、總大小。
+- **當時在做什麼**：Syncthing 正在同步嗎、加了多少檔案、卡了多久、哪個畫面（開影片、標籤頁、切資料夾…）。
+- **卡住當下的 sample**：Patina 開著、卡住時跑，10 秒。
+
+```sh
+cd ~/Patina   # 圖庫根目錄
+find . -type f -not -path './.patina/*' | wc -l                                          # 檔案數
+find . -type f -not -path './.patina/*' \( -iname '*.mov' -o -iname '*.mp4' -o -iname '*.m4v' \) | wc -l   # 影片數
+du -sh .                                                                                   # 總大小
+
+sample Patina 10 -file /tmp/patina-sample.txt > /dev/null
+sed -n '/Sort by top of stack/,/Binary Images/p' /tmp/patina-sample.txt | head -25
+grep -E '\(in Patina' /tmp/patina-sample.txt | sed -E 's/^[ +!:|]*//; s/  \(in .*//' \
+  | awk '{n=$1; $1=""; s[$0]+=n} END {for (k in s) print s[k] k}' | sort -nr | head -25
+```
+
+sample 的兩段輸出只有函式名稱和次數，沒有檔名，整段照原文貼進「卡住時的 sample」。`/tmp/patina-sample.txt` 本身含帳號名稱和路徑，不要整份貼上。
 
 用 `gh` 開 issue 時，先查有沒有一樣的：`gh issue list --repo cuberlab/patina-agent --search "<關鍵字>"`；沒有再用 `gh issue create --repo cuberlab/patina-agent --label bug` 開，內文照 bug 範本的欄位順序寫。

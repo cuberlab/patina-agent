@@ -31,6 +31,7 @@ description: >
 - 照片、影片、字體檔本身：不寫 EXIF／IPTC、不重新存檔、不轉檔。
 - `.patina/vault.json`、`.patina/removed/`、`.patina/log/`（只讀）。
 - 衝突副本：告訴使用者，不要自己刪或合併。
+- Syncthing 忽略規則：不能擋到 `.patina/`（不要加 `.*`、`.patina`）；要建議規則時照 README「Syncthing 設定」。
 
 ## 收尾
 
@@ -43,4 +44,5 @@ Patina app 出錯，或照 README 改圖庫時遇到問題：
 
 1. 先找有沒有一樣的 issue：`gh issue list --repo cuberlab/patina-agent --search "<關鍵字>"`。
 2. 沒有就開：`gh issue create --repo cuberlab/patina-agent --label bug`，內文照 bug 範本的欄位（app 版本、macOS 版本、做了什麼、預期、實際、錯誤原文、相關紀錄、重現步驟）。
-3. repo 是公開的：不貼私人照片與描述內容，家目錄路徑寫 `~`，私人檔名改成代稱。
+3. 很慢、卡住：另外附圖庫規模、當時在做什麼，和卡住當下的 sample 摘要（指令見 README「很慢、卡住」）。
+4. repo 是公開的：不貼私人照片與描述內容，家目錄路徑寫 `~`，私人檔名改成代稱。
