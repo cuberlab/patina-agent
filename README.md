@@ -4,7 +4,7 @@ Patina 的 agent kit：圖庫格式、agent 直接改圖庫資料夾的做法與
 
 ## Patina 是什麼
 
-Patina 是一個 Mac 圖庫 app，照片、影片和字體可以放在一起整理。圖庫就是一個普通的資料夾：子資料夾是分類，檔名就是名稱，檔案一直留在原處。描述、標籤、網址和評分存在圖庫根目錄的隱藏資料夾 `.patina/`，每個檔案一份 JSON 側檔。完整格式見 [docs/vault-format.md](docs/vault-format.md)。
+Patina 是一個 Mac 圖庫 app，照片、影片和字體可以放在一起整理。圖庫就是一個普通的資料夾：子資料夾是分類，檔名就是名稱，檔案一直留在原處。描述、標籤、網址和評分存在圖庫根目錄的隱藏資料夾 `.patina/`，每個檔案一份 JSON 側檔。完整格式見 [docs/vault-format.md](docs/vault-format.md)。iPhone 版用內建的 Syncthing 從 Mac 收圖庫，配對方式見「iPhone 配對」。
 
 ```
 ~/Patina/
@@ -409,6 +409,53 @@ Syncthing 這個資料夾的「忽略模式」（資料夾根目錄的 `.stignor
 
 - **側檔的副本**（`.patina/meta/`、`.patina/removed/` 底下）：Patina 0.2.4 起打開圖庫、偵測到變動時會自動合併：標籤取聯集，描述、網址、評分取 `updated_at` 比較新的那份（沒有 `updated_at` 就看側檔的修改時間），被蓋掉的值寫進 `.patina/log/`。agent 不要自己合併或刪掉。`check()` 列出來時，請使用者打開 Patina（0.2.4 以上）讓它合併，再跑一次 `check()`；還在就告訴使用者是哪幾份。
 - **照片、影片本身的副本**：Patina 不會自動處理（不知道哪個才對）。告訴使用者是哪幾份，讓使用者決定留哪個。
+
+## iPhone 配對
+
+Patina 的 iPhone 版內建 Syncthing，從 Mac 的 Syncthing 收圖庫。Mac 上要先有 Syncthing 在跑，圖庫已經是 Syncthing 資料夾（整個圖庫、包括 `.patina/`，見「Syncthing 設定」）。流程：手機掃 Mac 的 QR → Mac 接受手機、分享圖庫 → 手機勾要放的圖庫。
+
+### 1. 產生 Mac 的 QR
+
+QR 的內容就是 Mac 的 Syncthing 裝置 ID（純文字，不是網址）。
+
+- 使用者自己做：Syncthing 網頁介面（預設 `http://127.0.0.1:8384`）右上「動作 › 顯示 ID」。
+- Agent 產生圖檔：用 Syncthing 網頁介面自己的 QR 端點，不用另外裝工具。API key 從標準輸入交給 curl，不放進指令參數。
+
+```sh
+ID=$(syncthing device-id)
+GUI=$(syncthing cli config gui raw-address get)
+syncthing cli config gui apikey get | sed 's/^/X-API-Key: /' \
+  | curl -sf -H @- -o ~/Desktop/patina-pair.png "http://$GUI/qr/?text=$ID"
+```
+
+把 `patina-pair.png` 給使用者看，讓手機掃。網頁介面開了 HTTPS 時把 `http://` 換成 `https://` 並加 `-k`（自簽憑證）。找不到 `syncthing` 指令（例如用的是 Syncthing 的 macOS app）時，請使用者用網頁介面的「顯示 ID」。
+
+### 2. 手機掃 QR
+
+使用者在 iPhone 打開 Patina，「連到 Mac」畫面掃 QR，手機顯示「等待 Mac 接受」。
+
+### 3. Mac 接受手機、分享圖庫
+
+```sh
+syncthing cli show pending devices        # 等待加入的裝置：手機的 ID 和名稱
+syncthing cli config devices add --device-id <手機 ID> --name "<手機名稱>"
+for f in $(syncthing cli config folders list); do echo "$f  $(syncthing cli config folders "$f" path get)"; done   # 找圖庫的資料夾 ID
+syncthing cli config folders <資料夾 ID> devices add --device-id <手機 ID>
+```
+
+- pending 裡的名稱要是使用者的手機才加；看不出來就問使用者。
+- 網頁介面也可以：跳出「新裝置」→ 加入裝置 → 在圖庫資料夾的「共用」勾這支手機。
+- 手機上刪掉的檔案 Mac 會跟著刪。建議 Mac 這邊的圖庫資料夾開「垃圾桶」版本保留，刪錯可以從 `.stversions` 救回：`syncthing cli config folders <資料夾 ID> versioning type set trashcan`。
+
+### 4. 手機選圖庫
+
+手機列出 Mac 分享的圖庫，使用者勾要放的（會顯示大小和手機剩下的空間，放不下不能開始）再按開始。之後在 Patina 的同步頁可以「加入圖庫」、切換圖庫、「從手機移除」（只刪手機上的，Mac 不動）。
+
+### 卡住時
+
+- 手機一直「等待 Mac 接受」：Mac 還沒加這支手機，或還沒分享圖庫。`syncthing cli show pending devices` 還看得到手機就是還沒加。
+- 兩邊的 Syncthing 都要開著。不在同一個網路時靠 Syncthing 的全球探索與中繼，比較慢。
+- 掃不了 QR 時：「連到 Mac」畫面改用「改用這支手機的 ID」，Mac 用那個 ID 加裝置、分享圖庫，手機再接受。
 
 ## 從 Eagle 匯入
 

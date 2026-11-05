@@ -2,8 +2,8 @@
 name: patina
 description: >
   整理 Patina 圖庫（Mac app，一個資料夾就是一個圖庫）：直接改圖庫裡的 JSON 側檔來加標籤、寫描述、網址、評分，
-  改名、搬檔、資料夾改名時連側檔一起搬，檢查側檔格式，回報 Patina 的 bug。
-  觸發詞：Patina、圖庫、參考圖、加標籤、寫描述、整理照片、Eagle 匯入、Patina bug。
+  改名、搬檔、資料夾改名時連側檔一起搬，檢查側檔格式，產生 QR 讓 iPhone 版配對，回報 Patina 的 bug。
+  觸發詞：Patina、圖庫、參考圖、加標籤、寫描述、整理照片、Eagle 匯入、iPhone 配對、手機掃 QR、Patina bug。
 ---
 
 # Patina 圖庫整理
@@ -37,6 +37,14 @@ description: >
 
 - `check()` 印「沒有問題」才算完成。Patina 讀不了的側檔不會報錯，只會當成沒有整理資料。
 - 告訴使用者改了哪些檔案、加了哪些標籤。
+
+## iPhone 配對
+
+使用者要讓 iPhone 的 Patina 同步 Mac 的圖庫時，照 README「iPhone 配對」：
+
+1. 產生 Mac 的 Syncthing 裝置 ID 的 QR 給使用者看（QR 內容就是裝置 ID）。
+2. 手機掃完，`syncthing cli show pending devices` 確認是使用者的手機，再加裝置、把圖庫資料夾分享給它。
+3. 告訴使用者在手機上勾要放的圖庫。
 
 ## 回報 bug
 
