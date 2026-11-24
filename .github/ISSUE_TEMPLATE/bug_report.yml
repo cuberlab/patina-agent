@@ -38,7 +38,7 @@ body:
     id: action
     attributes:
       label: 做了什麼
-      description: 在 app 裡按了什麼，或改了哪些側檔、跑了哪段程式（完整內容）
+      description: 在 app 裡按了什麼（含 board 上的操作），或改了哪些側檔、board、跑了哪段程式（完整內容）
     validations:
       required: true
   - type: textarea

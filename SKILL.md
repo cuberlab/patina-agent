@@ -2,8 +2,9 @@
 name: patina
 description: >
   整理 Patina 圖庫（Mac app，一個資料夾就是一個圖庫）：直接改圖庫裡的 JSON 側檔來加標籤、寫描述、網址、評分，
-  改名、搬檔、資料夾改名時連側檔一起搬，檢查側檔格式，產生 QR 讓 iPhone 版配對，回報 Patina 的 bug。
-  觸發詞：Patina、圖庫、參考圖、加標籤、寫描述、整理照片、Eagle 匯入、iPhone 配對、手機掃 QR、Patina bug。
+  改名、搬檔、資料夾改名時連側檔一起搬，檢查側檔格式；讀 board 上使用者標的標籤並回覆，在 board 放圖、加文字、標籤、畫線；
+  產生 QR 讓 iPhone 版配對，回報 Patina 的 bug。
+  觸發詞：Patina、圖庫、參考圖、加標籤、寫描述、整理照片、board、標註、回覆標籤、Eagle 匯入、iPhone 配對、手機掃 QR、Patina bug。
 ---
 
 # Patina 圖庫整理
@@ -26,17 +27,27 @@ description: >
 - 改名、搬檔：`move()`，檔案和側檔一起搬，副檔名不改，撞名就換名字。資料夾改名或搬移：`move_folder()`，`.patina/meta/` 底下對應的資料夾一起搬。路徑大小寫要和磁碟上一樣。
 - 刪檔案或資料夾、從 Eagle 匯入：請使用者在 Patina app 裡做。
 
+## Boards
+
+board 是 `.patina/boards/<id>.json`，一個 board 一個檔，放圖、文字、線、標籤。把 README「Board 工具」那段存成 `patina_board.py`，改 `VAULT`、`AGENT`。
+
+1. 使用者在 board 上標了東西：`notes(<board>)` 列沒回覆的標籤（編號、文字、誰、哪張圖、`px` 原圖像素）。
+2. 直接讀圖庫裡的那張圖看標籤指的地方（`px` 是原圖像素，不是 board 上的大小），做事。
+3. `reply(<board>, n, "done"|"skip"|"note", "…")` 回覆每個處理過的標籤。
+4. 要指給使用者看：`add_line()`、`add_label()`（座標是原圖像素）；也可以 `add_image()`、`add_text()`。
+5. 守則：只經過 `update()` 寫（拿 `.patina/` 的鎖、寫前比對、被改過就重做、整份原子寫入）；不認得的欄位和元素原樣留著；改了元素就更新它和 board 的 `updated_at`／`updated_by`，回覆不動標籤的 `updated_at`；標籤編號不重用；拿掉元素用 `remove()` 留墓碑；`format` 不是 1 不寫；刪 board 請使用者在 app 裡做。
+
 ## 不能碰
 
 - 照片、影片、字體檔本身：不寫 EXIF／IPTC、不重新存檔、不轉檔。
-- `.patina/vault.json`、`.patina/removed/`、`.patina/log/`（只讀）。
-- 衝突副本：不要自己刪或合併（側檔的 Patina 會合併，照片、影片的讓使用者決定）。
+- `.patina/vault.json`、`.patina/removed/`（含刪掉的 board）、`.patina/log/`（只讀）。
+- 衝突副本：不要自己刪或合併（側檔、board 的 Patina 會合併，照片、影片的讓使用者決定）。
 - Syncthing 忽略規則：不能擋到 `.patina/`（不要加 `.*`、`.patina`）；要建議規則時照 README「Syncthing 設定」。
 
 ## 收尾
 
-- `check()` 印「沒有問題」才算完成。Patina 讀不了的側檔不會報錯，只會當成沒有整理資料。
-- 告訴使用者改了哪些檔案、加了哪些標籤。
+- `check()` 印「沒有問題」才算完成；改了 board 也跑 `check_boards()`。Patina 讀不了的側檔不會報錯，只會當成沒有整理資料。
+- 告訴使用者改了哪些檔案、加了哪些標籤、回覆了 board 上哪幾個標籤。
 
 ## iPhone 配對
 
